@@ -16,7 +16,8 @@ These scripts must be run on a AWS EC2 g5 Nvidia A10 instance type (tested on g5
 # What is included?
 Among the other packages these scripts will automagically install:
 - Nvidia driver v470
-- Docker
+- Nvidia CUDA v11.4
+- Docker version 20.10.11, build dea9396
 - Nvidia Container Toolkit
 - GLX/Vulkan
 - Apache Guacamole
