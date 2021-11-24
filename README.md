@@ -17,12 +17,14 @@ Among the other packages these scripts will install
 - nvidia drivers v470
 - docker https://www.docker.com/
 - Nvidia Container Toolkit
+- GLX/Vulkan
+- Apache Guacamole
 
 # Installation
 SSH into your EC2 box, once in just run the following
 ```bash
-git clone {this repo}
-cd setup
+git clone https://github.com/nrydevops/revup_cosmos.git
+cd revup_cosmos/setup/
 sudo su
 source setup.sh
 ```
