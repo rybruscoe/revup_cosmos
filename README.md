@@ -6,6 +6,7 @@
 ██║  ██║███████╗ ╚████╔╝ ╚██████╔╝██║         ╚██████╗╚██████╔╝███████║██║ ╚═╝ ██║╚██████╔╝███████║
 ╚═╝  ╚═╝╚══════╝  ╚═══╝   ╚═════╝ ╚═╝          ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝
 ```
+# Initial Setup
 # Before you start
 This is intended to be a **technology demo** setup to run hardware accelerated content on AWS g5 NVIDIA A10G Tensor Core GPU Hardware accelerated instances https://aws.amazon.com/ec2/instance-types/g5/
 
@@ -21,7 +22,7 @@ Among the other packages these scripts will automagically install:
 - Apache Guacamole
 
 # Installation
-SSH into your EC2 box, once in just run the following
+SSH into your EC2 box, and run the following:
 ```bash
 git clone https://github.com/nrydevops/revup_cosmos.git
 cd revup_cosmos/setup/
@@ -29,11 +30,21 @@ sudo su
 source setup.sh
 ```
 Keep in mind that:
-- The installation will reboot the machine once done.
+- The initial setup installations will reboot the machine once done.
 
-# How to launch the RevUp COSMOS cloud desktop
+# RevUp COSMOS cloud desktop
 
 MATE Desktop container supporting GLX/Vulkan for NVIDIA GPUs by spawning its own X Server and Guacamole interface instead of using the host X server. Does not require `/tmp/.X11-unix` host sockets or host configuration. Designed for Kubernetes, also supporting audio forwarding.
+
+# Launch COSMOS
+```
+cd revup_cosmos/cosmos_launch
+```
+```
+docker run --gpus 1 -it -e TZ=UTC -e SIZEW=1920 -e SIZEH=1080 -e CDEPTH=24 -e PASSWD=mypasswd -e VIDEO_PORT=DFP -p 8080:8080 ghcr.io/ehfd/nvidia-glx-desktop:latest
+```
+For Docker this will be sufficient (the container must only be used in unprivileged mode, use `--tmpfs /dev/shm:rw` for a slight performance improvement)
+# Additional details
 
 Requires reasonably recent NVIDIA GPU drivers and corresponding container toolkits to be set up on the host for allocating GPUs. GPUs should have one or more DVI-D/HDMI/DisplayPort digital video ports instead of having only analog video ports (but this only excludes very ancient GPUs). However, the ports to be used are recommended NOT to be connected with an actual monitor, unless the user wants the remote desktop screen to be shown in the monitor. If you need to connect a real monitor to the X server session spawned by the container, connect the monitor and set **VIDEO_PORT** to the the video port identifier that is connected to the monitor. Manually specify a video port identifier that is not connected to a monitor in **VIDEO_PORT** if you do not want this. **VIDEO_PORT** identifiers and their connection states can be obtained by typing `xrandr -q` when the `$DISPLAY` environment variable is set to the spawned X server display number (for example :0). **Do not start two or more X servers for a single GPU. Use a separate GPU (or use Xvfb/Xdummy/XVnc without hardware acceleration to not use any at all) if you need a host X server, and do not make the GPU available to the containers.**
 
@@ -50,9 +61,3 @@ Connect to the spawned Apache Guacamole instance with a web browser in port 8080
 Wine and Winetricks are bundled by default, comment out the installation section in **Dockerfile** if the user wants to remove them from the container.
 
 For building Ubuntu 18.04 containers, in **Dockerfile** change `FROM nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04` to `FROM nvidia/opengl:1.2-glvnd-runtime-ubuntu18.04`.
-
-For Docker this will be sufficient (the container must only be used in unprivileged mode, use `--tmpfs /dev/shm:rw` for a slight performance improvement):
-
-```
-docker run --gpus 1 -it -e TZ=UTC -e SIZEW=1920 -e SIZEH=1080 -e CDEPTH=24 -e PASSWD=mypasswd -e VIDEO_PORT=DFP -p 8080:8080 ghcr.io/ehfd/nvidia-glx-desktop:latest
-```
